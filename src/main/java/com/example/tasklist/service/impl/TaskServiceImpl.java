@@ -3,7 +3,6 @@ package com.example.tasklist.service.impl;
 import com.example.tasklist.domain.exception.ResourceNotFoundException;
 import com.example.tasklist.domain.task.Status;
 import com.example.tasklist.domain.task.Task;
-
 import com.example.tasklist.domain.task.TaskImage;
 import com.example.tasklist.domain.user.User;
 import com.example.tasklist.repository.TaskRepository;
@@ -17,7 +16,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.util.List;
 
 @Service

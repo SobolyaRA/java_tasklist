@@ -20,7 +20,6 @@ import org.springframework.security.access.expression.method.DefaultMethodSecuri
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -40,7 +39,7 @@ public class ApplicationConfig {
     private final MinioProperties minioProperties;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -50,7 +49,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient() {
         return MinioClient.builder().
                 endpoint(minioProperties.getUrl()).
                 credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
@@ -58,14 +57,14 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public DefaultMethodSecurityExpressionHandler expressionHandler(){
+    public DefaultMethodSecurityExpressionHandler expressionHandler() {
         DefaultMethodSecurityExpressionHandler expressionHandler = new CustomSecurityExceptionHandler();
         expressionHandler.setApplicationContext(applicationContext);
         return expressionHandler;
     }
 
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI openAPI() {
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(
@@ -85,7 +84,6 @@ public class ApplicationConfig {
     }
 
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -101,10 +99,10 @@ public class ApplicationConfig {
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
                     response.getWriter().write("Unauthorized.");
                 }))
-                .accessDeniedHandler(((request, response, accessDeniedException) ->{
+                .accessDeniedHandler(((request, response, accessDeniedException) -> {
                     response.setStatus(HttpStatus.FORBIDDEN.value());
                     response.getWriter().write("Unauthorized");
-                } ))
+                }))
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/v1/auth/**").permitAll()
