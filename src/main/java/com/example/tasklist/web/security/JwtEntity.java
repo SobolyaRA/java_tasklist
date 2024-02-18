@@ -36,5 +36,5 @@ public class JwtEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    
+
 }

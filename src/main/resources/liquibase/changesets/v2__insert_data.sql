@@ -9,12 +9,12 @@ values ('Buy cheese', null, 'TODO', '2023-01-29 12:00:00'),
        ('Call July', 'Meet with July', 'TODO', '2023-01-24 12:00:00');
 
 insert into users_tasks(task_id, user_id)
-values (1,1),
-       (2,2),
-       (3,2),
-       (4,1);
+values (1, 1),
+       (2, 2),
+       (3, 2),
+       (4, 1);
 
 insert into users_roles(user_id, role)
-values  (1, 'ROLE_ADMIN'),
-        (1, 'ROLE_USER'),
-        (2, 'ROLE_USER');
+values (1, 'ROLE_ADMIN'),
+       (1, 'ROLE_USER'),
+       (2, 'ROLE_USER');
