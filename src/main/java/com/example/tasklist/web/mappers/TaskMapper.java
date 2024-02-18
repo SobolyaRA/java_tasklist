@@ -7,10 +7,5 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface TaskMapper {
-    TaskDTO toDTO(Task task);
-
-    List<TaskDTO> toDTO(List<Task> tasks);
-
-    Task toEntity(TaskDTO dto);
+public interface TaskMapper extends Mappable<Task, TaskDTO> {
 }

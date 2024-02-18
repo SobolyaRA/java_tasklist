@@ -39,8 +39,7 @@ public class UserController {
     public UserDTO update(@Validated(OnUpdate.class) @RequestBody UserDTO dto){
         User user = userMapper.toEntity(dto);
         User updatedUser = userService.update(user);
-        return  userMapper.toDTO(updatedUser);
-
+        return  userMapper.toDto(updatedUser);
     }
 
     @GetMapping("/{id}")
@@ -48,7 +47,7 @@ public class UserController {
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public UserDTO getById(@PathVariable Long id){
         User user = userService.getById(id);
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     @Operation(summary = "Delete UserDTO by id")
@@ -63,7 +62,7 @@ public class UserController {
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
     public List<TaskDTO> getTasksByUserId(@PathVariable Long id){
         List<Task> tasks = taskService.getAllByUserId(id);
-        return taskMapper.toDTO(tasks);
+        return taskMapper.toDto(tasks);
     }
 
     @PostMapping("/{id}/tasks")
@@ -73,7 +72,7 @@ public class UserController {
                               @Validated(OnCreate.class) @RequestBody TaskDTO dto){
         Task task = taskMapper.toEntity(dto);
         Task createdTask = taskService.create(task, id);
-        return taskMapper.toDTO(createdTask);
+        return taskMapper.toDto(createdTask);
     }
 
 

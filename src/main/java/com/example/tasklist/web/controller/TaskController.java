@@ -1,9 +1,12 @@
 package com.example.tasklist.web.controller;
 
 import com.example.tasklist.domain.task.Task;
+import com.example.tasklist.domain.task.TaskImage;
 import com.example.tasklist.service.TaskService;
 import com.example.tasklist.web.DTO.task.TaskDTO;
+import com.example.tasklist.web.DTO.task.TaskImageDTO;
 import com.example.tasklist.web.DTO.validation.OnUpdate;
+import com.example.tasklist.web.mappers.TaskImageMapper;
 import com.example.tasklist.web.mappers.TaskMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +26,7 @@ public class TaskController {
     private final TaskService taskService;
 
     private final TaskMapper taskMapper;
+    private final TaskImageMapper taskImageMapper;
 
     @PutMapping
     @Operation(summary = "Update task")
@@ -30,7 +34,7 @@ public class TaskController {
     public TaskDTO update(@Validated(OnUpdate.class) @RequestBody TaskDTO dto){
         Task task = taskMapper.toEntity(dto);
         Task updatedTask = taskService.update(task);
-        return taskMapper.toDTO(updatedTask);
+        return taskMapper.toDto(updatedTask);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +42,7 @@ public class TaskController {
     @PreAuthorize("canAccessTask(#id)")
     public TaskDTO getById(@PathVariable Long id){
         Task task = taskService.getById(id);
-        return taskMapper.toDTO(task);
+        return taskMapper.toDto(task);
     }
 
     @DeleteMapping("/{id}")
@@ -46,5 +50,14 @@ public class TaskController {
     @PreAuthorize("canAccessTask(#id)")
     public void deleteById(@PathVariable Long id){
         taskService.delete(id);
+    }
+
+    @PostMapping("/{id}/image")
+    @Operation(summary = "Upload image to task")
+    @PreAuthorize("canAccessTask(#id)")
+    public void uploadImage(@PathVariable Long id,
+                            @Validated @ModelAttribute TaskImageDTO imageDto){
+        TaskImage image = taskImageMapper.toEntity(imageDto);
+        taskService.uploadImage(id, image);
     }
 }

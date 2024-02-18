@@ -36,7 +36,7 @@ public class AuthController {
     public UserDTO register(@Validated(OnCreate.class) @RequestBody UserDTO userDTO){
         User user = userMapper.toEntity(userDTO);
         User createdUser = userService.create(user);
-        return userMapper.toDTO(createdUser);
+        return userMapper.toDto(createdUser);
     }
 
     @PostMapping("/refresh")
