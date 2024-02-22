@@ -54,4 +54,5 @@ public class LocalDateTimeCoercing implements Coercing<LocalDateTime, String> {
     ) {
         return LocalDateTime.parse(((StringValue) input).getValue());
     }
+
 }
