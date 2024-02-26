@@ -1,10 +1,10 @@
 package com.example.tasklist.service.impl;
 
 import com.example.tasklist.config.TestConfig;
+import com.example.tasklist.domain.MailType;
 import com.example.tasklist.domain.exception.ResourceNotFoundException;
 import com.example.tasklist.domain.user.Role;
 import com.example.tasklist.domain.user.User;
-import com.example.tasklist.repository.TaskRepository;
 import com.example.tasklist.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,12 +14,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
@@ -32,22 +32,19 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @MockBean
-    private TaskRepository taskRepository;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @MockBean
-    private AuthenticationManager authenticationManager;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
+    private MailServiceImpl mailService;
 
     @Autowired
     private UserServiceImpl userService;
 
     @Test
-    void getById(){
+    void getById() {
         Long id = 1L;
         User user = new User();
-        user.setId(1L);
+        user.setId(id);
         Mockito.when(userRepository.findById(id))
                 .thenReturn(Optional.of(user));
         User testUser = userService.getById(id);
@@ -56,7 +53,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void getByIdWithNOtExistsId(){
+    void getByNotExistingId() {
         Long id = 1L;
         Mockito.when(userRepository.findById(id))
                 .thenReturn(Optional.empty());
@@ -66,7 +63,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void getByUsername(){
+    void getByUsername() {
         String username = "username@gmail.com";
         User user = new User();
         user.setUsername(username);
@@ -78,7 +75,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void getByNotExistingUsername(){
+    void getByNotExistingUsername() {
         String username = "username@gmail.com";
         Mockito.when(userRepository.findByUsername(username))
                 .thenReturn(Optional.empty());
@@ -88,7 +85,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void update(){
+    void update() {
         Long id = 1L;
         String password = "password";
         User user = new User();
@@ -106,7 +103,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void isTaskOwner(){
+    void isTaskOwner() {
         Long userId = 1L;
         Long taskId = 1L;
         Mockito.when(userRepository.isTaskOwner(userId, taskId))
@@ -117,7 +114,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void create(){
+    void create() {
         String username = "username@gmail.com";
         String password = "password";
         User user = new User();
@@ -130,6 +127,9 @@ public class UserServiceImplTest {
                 .thenReturn("encodedPassword");
         User testUser = userService.create(user);
         Mockito.verify(userRepository).save(user);
+        Mockito.verify(mailService).sendEmail(user,
+                MailType.REGISTRATION,
+                new Properties());
         Assertions.assertEquals(Set.of(Role.ROLE_USER), testUser.getRoles());
         Assertions.assertEquals("encodedPassword",
                 testUser.getPassword());
@@ -208,7 +208,5 @@ public class UserServiceImplTest {
         userService.delete(id);
         Mockito.verify(userRepository).deleteById(id);
     }
-
-
 
 }

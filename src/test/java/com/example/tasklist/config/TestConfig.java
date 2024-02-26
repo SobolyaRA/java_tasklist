@@ -2,119 +2,143 @@ package com.example.tasklist.config;
 
 import com.example.tasklist.repository.TaskRepository;
 import com.example.tasklist.repository.UserRepository;
-import com.example.tasklist.service.AuthService;
 import com.example.tasklist.service.ImageService;
-import com.example.tasklist.service.TaskService;
-import com.example.tasklist.service.UserService;
 import com.example.tasklist.service.impl.AuthServiceImpl;
 import com.example.tasklist.service.impl.ImageServiceImpl;
+import com.example.tasklist.service.impl.MailServiceImpl;
 import com.example.tasklist.service.impl.TaskServiceImpl;
 import com.example.tasklist.service.impl.UserServiceImpl;
 import com.example.tasklist.service.props.JwtProperties;
 import com.example.tasklist.service.props.MinioProperties;
 import com.example.tasklist.web.security.JwtTokenProvider;
 import com.example.tasklist.web.security.JwtUserDetailsService;
+import freemarker.template.Configuration;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @TestConfiguration
 @RequiredArgsConstructor
 public class TestConfig {
 
-
-    private final UserRepository userRepository;
-    private final TaskRepository taskRepository;
-    private final AuthenticationManager authenticationManager;
-
     @Bean
     @Primary
-    public PasswordEncoder testPasswordEncoder(){
+    public BCryptPasswordEncoder testPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public JwtProperties jwtProperties(){
+    public JwtProperties jwtProperties() {
         JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.setSecret(
-                "ZGtzZmdrc2RoZ2FmYXNkZmthc2hkY2doag=="
+                "dmdqYmhqbmttYmNhamNjZWhxa25hd2puY2xhZWtic3ZlaGtzYmJ1dg=="
         );
         return jwtProperties;
     }
 
     @Bean
-    @Primary
-    public UserDetailsService userDetailsService(){
-        return new JwtUserDetailsService(
-                userService()
-        );
+    public UserDetailsService userDetailsService(
+            final UserRepository userRepository
+    ) {
+        return new JwtUserDetailsService(userService(userRepository));
     }
 
     @Bean
-    public MinioClient minioClient(){
-        return Mockito.mock(
-                MinioClient.class
-        );
+    public MinioClient minioClient() {
+        return Mockito.mock(MinioClient.class);
     }
 
     @Bean
-    public MinioProperties minioProperties(){
+    public MinioProperties minioProperties() {
         MinioProperties properties = new MinioProperties();
         properties.setBucket("images");
         return properties;
     }
 
     @Bean
-    @Primary
-    public ImageService imageService(){
-        return new ImageServiceImpl(
-                minioClient(),
-                minioProperties()
-        );
+    public Configuration configuration() {
+        return Mockito.mock(Configuration.class);
     }
 
     @Bean
-    public JwtTokenProvider tokenProvider(){
+    public JavaMailSender mailSender() {
+        return Mockito.mock(JavaMailSender.class);
+    }
+
+    @Bean
+    @Primary
+    public MailServiceImpl mailService() {
+        return new MailServiceImpl(configuration(), mailSender());
+    }
+
+    @Bean
+    @Primary
+    public ImageService imageService() {
+        return new ImageServiceImpl(minioClient(), minioProperties());
+    }
+
+    @Bean
+    public JwtTokenProvider tokenProvider(
+            final UserRepository userRepository
+    ) {
         return new JwtTokenProvider(jwtProperties(),
-                userDetailsService(),
-                userService()
-        );
+                userDetailsService(userRepository),
+                userService(userRepository));
     }
 
     @Bean
     @Primary
-    public UserService userService(){
+    public UserServiceImpl userService(
+            final UserRepository userRepository
+    ) {
         return new UserServiceImpl(
                 userRepository,
-                testPasswordEncoder()
+                testPasswordEncoder(),
+                mailService()
         );
     }
 
     @Bean
     @Primary
-    public TaskService taskService(){
-        return new TaskServiceImpl(
-                taskRepository,
-                imageService()
-        );
+    public TaskServiceImpl taskService(
+            final TaskRepository taskRepository
+    ) {
+        return new TaskServiceImpl(taskRepository, imageService());
     }
 
     @Bean
     @Primary
-    public AuthService authService(){
+    public AuthServiceImpl authService(
+            final UserRepository userRepository,
+            final AuthenticationManager authenticationManager
+    ) {
         return new AuthServiceImpl(
                 authenticationManager,
-                userService(),
-                tokenProvider()
+                userService(userRepository),
+                tokenProvider(userRepository)
         );
     }
 
+    @Bean
+    public UserRepository userRepository() {
+        return Mockito.mock(UserRepository.class);
+    }
+
+    @Bean
+    public TaskRepository taskRepository() {
+        return Mockito.mock(TaskRepository.class);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return Mockito.mock(AuthenticationManager.class);
+    }
 
 }

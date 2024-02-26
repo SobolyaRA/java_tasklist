@@ -98,6 +98,6 @@ public class ControllerAdvice {
     public ExceptionBody handleException(
             final Exception e
     ) {
-        return new ExceptionBody("Internal error");
+        return new ExceptionBody("Internal error" + e.getMessage());
     }
 }

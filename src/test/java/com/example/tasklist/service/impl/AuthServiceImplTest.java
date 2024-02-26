@@ -6,7 +6,6 @@ import com.example.tasklist.domain.user.Role;
 import com.example.tasklist.domain.user.User;
 import com.example.tasklist.repository.TaskRepository;
 import com.example.tasklist.repository.UserRepository;
-import com.example.tasklist.service.UserService;
 import com.example.tasklist.web.DTO.auth.JwtRequest;
 import com.example.tasklist.web.DTO.auth.JwtResponse;
 import com.example.tasklist.web.security.JwtTokenProvider;
@@ -36,7 +35,7 @@ public class AuthServiceImplTest {
     private AuthenticationManager authenticationManager;
 
     @MockBean
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @MockBean
     private UserRepository userRepository;
@@ -101,7 +100,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void refresh(){
+    void refresh() {
         String refreshToken = "refreshToken";
         String accessToken = "accessToken";
         String newRefreshToken = "newRefreshToken";
@@ -114,4 +113,5 @@ public class AuthServiceImplTest {
         Mockito.verify(tokenProvider).refreshUserTokens(refreshToken);
         Assertions.assertEquals(testResponse, response);
     }
+
 }
